@@ -1,11 +1,5 @@
 [build-system]
-requires = [
-    "flit_core >=2,<4",
-    "openpyxl",
-    "pandas",
-    "pyperclip",
-    "xlwings"
-]
+requires = ["flit_core >=2,<4"]
 build-backend = "flit_core.buildapi"
 
 [tool.flit.metadata]

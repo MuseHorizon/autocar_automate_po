@@ -26,6 +26,10 @@ from shutil import move
 # Disable warnings
 warnings.filterwarnings('ignore')
 
+# Display full dataframe
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
+
 # Dataframe structure
 DF = pd.DataFrame(columns=[
     'PO_Identifier',  # A
@@ -121,13 +125,6 @@ def main():
     ws_check = wb_check.active
     lr_ws_check = len(ws_check['A'])
 
-    # Conditional formatting
-    yellow_fill = pyxl.styles.PatternFill(bgColor='00FFFF00')
-    dxf = pyxl.styles.differential.DifferentialStyle(fill=yellow_fill)
-    conditional_formatting_rule = pyxl.formatting.Rule(type="expression", dxf=dxf, stopIfTrue=False)
-    conditional_formatting_rule.formula = ['C2=""']  # HARDCODED
-    ws_check.conditional_formatting.add('C2:' + COLS[-4] + str(lr_ws_check), conditional_formatting_rule)
-
     # Get columns
     unit_price_col = ''
     supplier_nr_col = ''
@@ -197,6 +194,21 @@ def main():
             supplier_part_nr_col = col
         if col_val == 'remarks':
             remarks_col = col
+
+    # Conditional formatting
+    yellow_fill = pyxl.styles.PatternFill(bgColor='00FFFF00')
+    dxf_yellow = pyxl.styles.differential.DifferentialStyle(fill=yellow_fill)
+    conditional_formatting_rule_yellow = pyxl.formatting.Rule(type="expression", dxf=dxf_yellow, stopIfTrue=False)
+    red_fill = pyxl.styles.PatternFill(bgColor='00FF0000')
+    dxf_red = pyxl.styles.differential.DifferentialStyle(fill=red_fill)
+    conditional_formatting_rule_red1 = pyxl.formatting.Rule(type="expression", dxf=dxf_red, stopIfTrue=False)
+    conditional_formatting_rule_red2 = pyxl.formatting.Rule(type="expression", dxf=dxf_red, stopIfTrue=False)
+    conditional_formatting_rule_yellow.formula = ['C2=""']  # HARDCODED
+    conditional_formatting_rule_red1.formula = ['K2=0']  # HARDCODED
+    conditional_formatting_rule_red2.formula = ['O2=0']  # HARDCODED
+    ws_check.conditional_formatting.add('C2:' + COLS[-4] + str(lr_ws_check), conditional_formatting_rule_yellow)  # HARDCODED
+    ws_check.conditional_formatting.add(quantity_col + '2:' + quantity_col + str(lr_ws_check), conditional_formatting_rule_red1)
+    ws_check.conditional_formatting.add(unit_price_col + '2:' + unit_price_col + str(lr_ws_check), conditional_formatting_rule_red2)
 
     # Set Number format
     for row in range(1, lr_ws_check + 1):
@@ -277,9 +289,20 @@ def main():
     # Populate df_export
     populate_export(check_filename, time_identifier)
 
+    # Ask if import was successful
+    while True:
+        in_import_suc = input('\nWas the import successful? Press "Y" to continue and "N" after the errors are fixed in the file: ' + check_filename.stem + '\n')
+        if in_import_suc.lower() == 'y':
+            break
+        if in_import_suc.lower() == 'n':
+            populate_export(check_filename, time_identifier)
+        else:
+            print('Invalid entry')
+            continue
+
     # Copy the PO file to server
     po_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '_PR_output' + '.csv')
-    user_input_check_file('\nCopy the Requisition Import Success file to this folder')
+    user_input_check_file('\nCopy the Requisition Import Success file: ' + po_filename + ' to this folder')
     try:
         move(po_filename, Path('//gvwac52/users/requisition/PO/import') / po_filename)
     except Exception:

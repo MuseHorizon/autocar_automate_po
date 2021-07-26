@@ -304,7 +304,7 @@ def main():
     po_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '_PR_output' + '.csv')
     user_input_check_file('\nCopy the Requisition Import Success file: ' + po_filename + ' to this folder')
     try:
-        move(po_filename, Path('//gvwac52/users/requisition/PO/import') / po_filename)
+        move(po_filename, Path('//gvwac53/users/requisition/PO/import') / po_filename)
     except Exception:
         print('Unable to move the file. Please ensure that it is not open')
     pyperclip.copy(po_filename)
@@ -589,7 +589,7 @@ def populate_export(check_filename, time_identifier):
     print('--------------------PR Import Data--------------------')
     user_input_check_file('\nAre you sure you want to import?')
     export_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '.csv')
-    df_export.to_csv(Path('//gvwac52/users/requisition/PR/import') / export_filename, index=False)
+    df_export.to_csv(Path('//gvwac53/users/requisition/PR/import') / export_filename, index=False)
     pyperclip.copy(export_filename)
     print('Copied file to clipboard: ' + export_filename)
 

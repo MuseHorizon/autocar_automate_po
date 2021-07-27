@@ -23,6 +23,9 @@ import warnings
 from os import getlogin
 from shutil import move
 
+# Test server
+TEST_MODE = False
+
 # Disable warnings
 warnings.filterwarnings('ignore')
 
@@ -229,7 +232,7 @@ def main():
         ws_check[supplier_pr_col + str(row)].fill = grey_fill
         ws_check[supplier_name_col + str(row)].fill = grey_fill
         ws_check[ship_to_text_col + str(row)].fill = grey_fill
-        ws_check[requested_by_col + str(row)].fill = grey_fill
+        ws_check[requested_by_col + str(row)].fill = edit_fill
         ws_check[supplier_part_nr_col + str(row)].fill = grey_fill
         ws_check[remarks_col + str(row)].fill = grey_fill
 
@@ -284,7 +287,7 @@ def main():
         print(*excel_2003_files, sep='\n')
 
     # Ask user to check and update the file
-    user_input_check_file('\nPlease check the file: ' + check_filename.stem)
+    user_input_check_file('\nPlease check and save the file: ' + check_filename.stem)
 
     # Populate df_export
     populate_export(check_filename, time_identifier)
@@ -302,11 +305,17 @@ def main():
 
     # Copy the PO file to server
     po_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '_PR_output' + '.csv')
-    user_input_check_file('\nCopy the Requisition Import Success file: ' + po_filename + ' to this folder')
-    try:
-        move(po_filename, Path('//gvwac53/users/requisition/PO/import') / po_filename)
-    except Exception:
-        print('Unable to move the file. Please ensure that it is not open')
+    while True:
+        user_input_check_file('\nCopy the Requisition Import Success file: ' + po_filename + ' to this folder')
+        try:
+            if TEST_MODE:
+                move(po_filename, Path('//gvwac52/users/requisition/PO/import') / po_filename)
+            else:
+                move(po_filename, Path('//gvwac53/users/requisition/PO/import') / po_filename)
+            break
+        except Exception:
+            print('\nUnable to move the file. Please ensure that the file: ' + po_filename + ' is copied to this folder')
+            continue
     pyperclip.copy(po_filename)
     print('\nCopied to clipboard: ' + po_filename)
     # ----------------------------------------------------------------------------------------------------
@@ -522,7 +531,7 @@ def load_file_data(path, po_identifier, file_name):
             'Cost_Center': '',
             'Supplier_Part_Number': '',
             'Ship_To': ship_to_nr,
-            'Comments': 'Please reference this Purchase Order on the Invoice.  Email the Invoice to ap@autocartruck.com',
+            'Comments': 'Please reference this Purchase Order on the Invoice. Email the Invoice to ap@autocartruck.com',
             'Supplier_Number': supplier_nr,
             'Supplier_Name': supplier_name
         }
@@ -539,7 +548,9 @@ def populate_export(check_filename, time_identifier):
             'Ship_To': str,
             'Purchase_Account': str,
             'Sub_Account': str,
-            'Cost_Center': str
+            'Cost_Center': str,
+            'Requested_By': str,
+            'Comments': str
         })
         return df_check
     df_check = df_check_read_excel()
@@ -564,6 +575,9 @@ def populate_export(check_filename, time_identifier):
             break
     df_check['Date_Required'] = df_check['Date_Required'].dt.strftime('%m/%d/%y')
 
+    # Set requested by comment
+    df_check['Comment_Requested'] = 'Requestsed by ' + df_check['Requested_By'].astype(str) + '. '
+
     # Populate export
     df_export = pd.DataFrame()
     df_export['Request ID'] = df_check['PO_Identifier']
@@ -581,7 +595,7 @@ def populate_export(check_filename, time_identifier):
     df_export['Cost Center'] = df_check['Cost_Center']
     df_export['Supplier'] = df_check['Supplier_Number']
     df_export['Ship-To'] = df_check['Ship_To']
-    df_export['Comments'] = df_check['Comments']
+    df_export['Comments'] = df_check['Comment_Requested'] + df_check['Comments']
 
     print('--------------------PR Import Data--------------------')
     df_print = df_export[['Request ID', 'Item', 'Site', 'Quantity', 'UM', 'Unit Cost', 'Need Date', 'Pur Acct', 'Sub Acct', 'Cost Center', 'Supplier', 'Ship-To']]
@@ -589,7 +603,10 @@ def populate_export(check_filename, time_identifier):
     print('--------------------PR Import Data--------------------')
     user_input_check_file('\nAre you sure you want to import?')
     export_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '.csv')
-    df_export.to_csv(Path('//gvwac53/users/requisition/PR/import') / export_filename, index=False)
+    if TEST_MODE:
+        df_export.to_csv(Path('//gvwac52/users/requisition/PR/import') / export_filename, index=False)
+    else:
+        df_export.to_csv(Path('//gvwac53/users/requisition/PR/import') / export_filename, index=False)
     pyperclip.copy(export_filename)
     print('Copied file to clipboard: ' + export_filename)
 

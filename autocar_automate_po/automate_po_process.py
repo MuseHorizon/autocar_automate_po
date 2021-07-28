@@ -576,7 +576,7 @@ def populate_export(check_filename, time_identifier):
     df_check['Date_Required'] = df_check['Date_Required'].dt.strftime('%m/%d/%y')
 
     # Set requested by comment
-    df_check['Comment_Requested'] = 'Requestsed by ' + df_check['Requested_By'].astype(str) + '. '
+    df_check['Comment_Requested'] = 'Requested by ' + df_check['Requested_By'].astype(str) + '. '
 
     # Populate export
     df_export = pd.DataFrame()

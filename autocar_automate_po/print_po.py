@@ -27,14 +27,14 @@ def main():
     time_identifier = datetime.now().strftime('%m%d%y-%H%M%S')
     i_identifier = 1
 
-    Path('PR_Processed_Files').mkdir(exist_ok=True)
+    Path('export').mkdir(exist_ok=True)
 
     for path in Path('Files_To_Process').glob('*.xlsx'):
         try:
             po_identifier = 'PR-' + time_identifier + '-' + str(i_identifier)
             change_file(path, po_identifier)
             print('Printing file: ' + po_identifier)
-            os.startfile(Path('PR_Processed_Files') / (po_identifier + '.xlsx'), 'print')
+            os.startfile(Path('export') / (po_identifier + '.xlsx'), 'print')
             files_to_move.append(po_identifier + '.xlsx')
             print('Loading...')
             sleep(10)
@@ -45,7 +45,7 @@ def main():
     print('Moving files to P drive...')
     for path in files_to_move:
         try:
-            move(Path('PR_Processed_Files') / path, Path(NETWORK_SAVE) / path)
+            move(Path('export') / path, Path(NETWORK_SAVE) / path)
         except Exception:
             files_not_moved.append(path)
 
@@ -68,7 +68,7 @@ def change_file(path, po_identifier):
 
     ws['C1'].value = po_identifier
     ws['C1'].alignment = Alignment(wrap_text=False)
-    wb.save(Path('PR_Processed_Files') / (po_identifier + '.xlsx'))
+    wb.save(Path('export') / (po_identifier + '.xlsx'))
 
 
 if __name__ == '__main__':

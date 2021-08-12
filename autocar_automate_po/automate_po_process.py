@@ -355,6 +355,8 @@ def load_file_data(path, po_identifier, file_name):
             except AttributeError:
                 head_date = datetime.today()
                 head_date = head_date.strftime('%m/%d/%Y')
+        else:
+            head_date = ''
     except Exception:
         head_date = ''
 

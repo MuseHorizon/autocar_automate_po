@@ -361,6 +361,7 @@ def load_file_data(path, po_identifier, file_name):
         head_date = ''
 
     # Supplier name from PR
+    head_supplier_name = ''
     try:
         if ws['A8'].value is not None:
             head_supplier_name = ws['A8'].value

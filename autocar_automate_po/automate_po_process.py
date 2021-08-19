@@ -206,12 +206,15 @@ def main():
     dxf_red = pyxl.styles.differential.DifferentialStyle(fill=red_fill)
     conditional_formatting_rule_red1 = pyxl.formatting.Rule(type="expression", dxf=dxf_red, stopIfTrue=False)
     conditional_formatting_rule_red2 = pyxl.formatting.Rule(type="expression", dxf=dxf_red, stopIfTrue=False)
+    conditional_formatting_rule_red3 = pyxl.formatting.Rule(type="expression", dxf=dxf_red, stopIfTrue=False)
     conditional_formatting_rule_yellow.formula = ['C2=""']  # HARDCODED
     conditional_formatting_rule_red1.formula = ['K2=0']  # HARDCODED
     conditional_formatting_rule_red2.formula = ['O2=0']  # HARDCODED
+    conditional_formatting_rule_red3.formula = ['=LEN(M2)>18']  # HARDCODED
     ws_check.conditional_formatting.add('C2:' + COLS[-4] + str(lr_ws_check), conditional_formatting_rule_yellow)  # HARDCODED
     ws_check.conditional_formatting.add(quantity_col + '2:' + quantity_col + str(lr_ws_check), conditional_formatting_rule_red1)
     ws_check.conditional_formatting.add(unit_price_col + '2:' + unit_price_col + str(lr_ws_check), conditional_formatting_rule_red2)
+    ws_check.conditional_formatting.add(part_nr_col + '2:' + part_nr_col + str(lr_ws_check), conditional_formatting_rule_red3)
 
     # Set Number format
     for row in range(1, lr_ws_check + 1):
@@ -305,19 +308,20 @@ def main():
 
     # Copy the PO file to server
     po_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '_PR_output' + '.csv')
+    po_new_filename = po_filename[9:]
     while True:
         user_input_check_file('\nCopy the Requisition Import Success file: ' + po_filename + ' to this folder')
         try:
             if TEST_MODE:
-                move(po_filename, Path('//gvwac52/users/requisition/PO/import') / po_filename)
+                move(po_filename, Path('//gvwac52/users/requisition/PO/import') / po_new_filename)
             else:
-                move(po_filename, Path('//gvwac53/users/requisition/PO/import') / po_filename)
+                move(po_filename, Path('//gvwac53/users/requisition/PO/import') / po_new_filename)
             break
         except Exception:
             print('\nUnable to move the file. Please ensure that the file: ' + po_filename + ' is copied to this folder')
             continue
-    pyperclip.copy(po_filename)
-    print('\nCopied to clipboard: ' + po_filename)
+    pyperclip.copy(po_new_filename)
+    print('\nCopied to clipboard: ' + po_new_filename)
     # ----------------------------------------------------------------------------------------------------
     _ = input('Press Enter to exit\n')
 
@@ -580,6 +584,9 @@ def populate_export(check_filename, time_identifier):
 
     # Set requested by comment
     df_check['Comment_Requested'] = 'Requested by ' + df_check['Requested_By'].astype(str) + '. '
+
+    # Part_Number length 18 char
+    df_check['Part_Number'] = df_check['Part_Number'].str.slice(0, 18)
 
     # Populate export
     df_export = pd.DataFrame()

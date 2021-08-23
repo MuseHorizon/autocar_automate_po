@@ -308,7 +308,7 @@ def main():
 
     # Copy the PO file to server
     po_filename = ('pr_input_' + getlogin() + '_' + time_identifier + '_PR_output' + '.csv')
-    po_new_filename = po_filename[9:]
+    po_new_filename = po_filename[-20:]
     while True:
         user_input_check_file('\nCopy the Requisition Import Success file: ' + po_filename + ' to this folder')
         try:

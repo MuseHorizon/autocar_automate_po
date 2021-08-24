@@ -55,8 +55,8 @@ DF = pd.DataFrame(columns=[
     'Cost_Center',  # R
     'Short_Requested_By',  # S
     'Requested_By',  # T
-    'Supplier_Part_Number',  # U
-    'Comments',  # V
+    'Line_Comments',  # U
+    'Header_Comments',  # V
     'Remarks'  # W
 ]
 )
@@ -148,7 +148,7 @@ def main():
     supplier_name_col = ''
     ship_to_text_col = ''
     requested_by_col = ''
-    supplier_part_nr_col = ''
+    line_comments_col = ''
     remarks_col = ''
 
     for col in COLS:
@@ -183,7 +183,7 @@ def main():
             cost_center_col = col
         if col_val == 'short_requested_by':
             short_req_by_col = col
-        if col_val == 'comments':
+        if col_val == 'header_comments':
             comments_col = col
         if col_val == 'supplier_from_pr':
             supplier_pr_col = col
@@ -193,8 +193,8 @@ def main():
             ship_to_text_col = col
         if col_val == 'requested_by':
             requested_by_col = col
-        if col_val == 'supplier_part_number':
-            supplier_part_nr_col = col
+        if col_val == 'line_comments':
+            line_comments_col = col
         if col_val == 'remarks':
             remarks_col = col
 
@@ -236,7 +236,7 @@ def main():
         ws_check[supplier_name_col + str(row)].fill = grey_fill
         ws_check[ship_to_text_col + str(row)].fill = grey_fill
         ws_check[requested_by_col + str(row)].fill = edit_fill
-        ws_check[supplier_part_nr_col + str(row)].fill = grey_fill
+        ws_check[line_comments_col + str(row)].fill = edit_fill
         ws_check[remarks_col + str(row)].fill = grey_fill
 
         ws_check[supplier_nr_col + str(row)].fill = edit_fill
@@ -536,9 +536,9 @@ def load_file_data(path, po_identifier, file_name):
             'Purchase_Account': '',
             'Sub_Account': '',
             'Cost_Center': '',
-            'Supplier_Part_Number': '',
+            'Line_Comments': '',
             'Ship_To': ship_to_nr,
-            'Comments': 'Please reference this Purchase Order on the Invoice. Email the Invoice to ap@autocartruck.com',
+            'Header_Comments': 'Please reference this Purchase Order on the Invoice. Email the Invoice to ap@autocartruck.com',
             'Supplier_Number': supplier_nr,
             'Supplier_Name': supplier_name
         }
@@ -557,7 +557,8 @@ def populate_export(check_filename, time_identifier):
             'Sub_Account': str,
             'Cost_Center': str,
             'Requested_By': str,
-            'Comments': str
+            'Line_Comments': str,
+            'Header_Comments': str
         })
         return df_check
     df_check = df_check_read_excel()
@@ -605,10 +606,11 @@ def populate_export(check_filename, time_identifier):
     df_export['Cost Center'] = df_check['Cost_Center']
     df_export['Supplier'] = df_check['Supplier_Number']
     df_export['Ship-To'] = df_check['Ship_To']
-    df_export['Comments'] = df_check['Comment_Requested'] + df_check['Comments']
+    df_export['Header Comments'] = df_check['Comment_Requested'] + df_check['Header_Comments']
+    df_export['Line Comments'] = df_check['Line_Comments']
 
     print('--------------------PR Import Data--------------------')
-    df_print = df_export[['Request ID', 'Item', 'Site', 'Quantity', 'UM', 'Unit Cost', 'Need Date', 'Pur Acct', 'Sub Acct', 'Cost Center', 'Supplier', 'Ship-To']]
+    df_print = df_export[['Item', 'Site', 'Quantity', 'UM', 'Unit Cost', 'Need Date', 'Supplier']]
     print(df_print)
     print('--------------------PR Import Data--------------------')
     user_input_check_file('\nAre you sure you want to import?')

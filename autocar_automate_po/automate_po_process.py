@@ -461,12 +461,28 @@ def load_file_data(path, po_identifier, file_name):
         if str(ws['B' + str(row)].value).lower() == 'date required':
             data_start_row = row + 1
             break
+    if data_start_row == 0:
+        for row in range(1, last_row):
+            if str(ws['C' + str(row)].value).lower() == 'date required':
+                data_start_row = row + 1
+                break
+    if data_start_row == 0:
+        for row in range(1, last_row):
+            if str(ws['C' + str(row)].value).lower() == 'quantity':
+                data_start_row = row + 1
+                break
+    if data_start_row == 0:
+        for row in range(1, last_row):
+            if str(ws['D' + str(row)].value).lower() == 'quantity':
+                data_start_row = row + 1
+                break
+
     data_end_row = 0
     for row in range(data_start_row, last_row):
         if ws['B' + str(row)].value is None:
             data_end_row = row - 1
             break
-    # Check if Column B (Data Required) is empty
+    # Check if Column B (Date Required) is empty
     if data_end_row < data_start_row:
         for row in range(data_start_row, last_row):
             if ws['C' + str(row)].value is None:

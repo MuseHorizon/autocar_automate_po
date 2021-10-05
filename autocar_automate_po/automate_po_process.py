@@ -608,20 +608,20 @@ def populate_export(check_filename, time_identifier):
     # Populate export
     df_export = pd.DataFrame()
     df_export['Request ID'] = df_check['PO_Identifier']
-    df_export['Item'] = df_check['Part_Number']
+    df_export['Item'] = df_check['Part_Number'].str.strip()
     df_export['Description'] = df_check['Description']
-    df_export['Site'] = df_check['Site']
+    df_export['Site'] = df_check['Site'].str.strip()
     df_export['Quantity'] = df_check['Quantity']
     df_export['UM'] = df_check['UOM']
     df_export['Unit Cost'] = df_check['Unit_Price']
     df_export['Release Date'] = df_check['PR_Date']
     df_export['Need Date'] = df_check['Date_Required']
-    df_export['Requested By'] = df_check['Short_Requested_By']
-    df_export['Pur Acct'] = df_check['Purchase_Account']
-    df_export['Sub Acct'] = df_check['Sub_Account']
-    df_export['Cost Center'] = df_check['Cost_Center']
-    df_export['Supplier'] = df_check['Supplier_Number']
-    df_export['Ship-To'] = df_check['Ship_To']
+    df_export['Requested By'] = df_check['Short_Requested_By'].str.strip()
+    df_export['Pur Acct'] = df_check['Purchase_Account'].str.strip()
+    df_export['Sub Acct'] = df_check['Sub_Account'].str.strip()
+    df_export['Cost Center'] = df_check['Cost_Center'].str.strip()
+    df_export['Supplier'] = df_check['Supplier_Number'].str.strip()
+    df_export['Ship-To'] = df_check['Ship_To'].str.strip()
     df_export['Header Comments'] = df_check['Comment_Requested'] + df_check['Header_Comments']
     df_export['Line Comments'] = df_check['Line_Comments']
 

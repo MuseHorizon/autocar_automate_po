@@ -321,7 +321,8 @@ def main():
             print('\nUnable to move the file. Please ensure that the file: ' + po_filename + ' is copied to this folder')
             continue
     pyperclip.copy(po_new_filename)
-    print('\nCopied to clipboard: ' + po_new_filename)
+    print('\n--------------------PO IMPORT--------------------')
+    print('Copied to clipboard: ' + po_new_filename)
     # ----------------------------------------------------------------------------------------------------
     _ = input('Press Enter to exit\n')
 
@@ -522,6 +523,7 @@ def load_file_data(path, po_identifier, file_name):
         try:
             part_number = str(ws[col_part_number + str(row)].value)
             part_number = part_number.strip()
+            part_number = part_number.replace('"', '')
         except Exception:
             part_number = ''
         try:
@@ -530,8 +532,13 @@ def load_file_data(path, po_identifier, file_name):
             description = ''
         try:
             unit_price = ws[col_unit_price + str(row)].value
+            unit_price = round(unit_price, 5)
         except Exception:
             unit_price = ''
+
+        line_comments = ''
+        if remarks[0:2] == 'WF':
+            line_comments = remarks
 
         data_to_df = {
             'PO_Identifier': po_identifier,
@@ -552,7 +559,7 @@ def load_file_data(path, po_identifier, file_name):
             'Purchase_Account': '',
             'Sub_Account': '',
             'Cost_Center': '',
-            'Line_Comments': '',
+            'Line_Comments': line_comments,
             'Ship_To': ship_to_nr,
             'Header_Comments': 'Please reference this Purchase Order on the Invoice. Email the Invoice to ap@autocartruck.com',
             'Supplier_Number': supplier_nr,
@@ -636,7 +643,8 @@ def populate_export(check_filename, time_identifier):
     else:
         df_export.to_csv(Path('//gvwac53/users/requisition/PR/import') / export_filename, index=False)
     pyperclip.copy(export_filename)
-    print('Copied file to clipboard: ' + export_filename)
+    print('\n--------------------PO REQUISITION--------------------')
+    print('Copied to clipboard: ' + export_filename)
 
 
 def print_progress_bar(iteration, total, prefix='', suffix='', decimals=0, length=100, fill='█', printEnd='\r'):

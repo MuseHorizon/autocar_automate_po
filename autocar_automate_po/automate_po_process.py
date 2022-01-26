@@ -537,8 +537,12 @@ def load_file_data(path, po_identifier, file_name):
             unit_price = ''
 
         line_comments = ''
-        if remarks[0:2] == 'WF':
-            line_comments = remarks
+        try:
+            if remarks is not None:
+                if remarks[0:2] == 'WF':
+                    line_comments = remarks
+        except Exception:
+            remarks = ''
 
         data_to_df = {
             'PO_Identifier': po_identifier,
